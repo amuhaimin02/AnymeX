@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:anymex/core/Eval/dart/model/page.dart';
 import 'package:anymex/screens/manga/controller/reader_controller.dart';
 import 'package:anymex/screens/manga/reading_page.dart';
@@ -210,13 +212,13 @@ class ReaderView extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 ElevatedButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     // Force refresh the specific image
                     final imageProvider = CachedNetworkImageProvider(
                       page.url,
                       headers: page.headers,
                     );
-                    imageProvider.evict();
+                    await imageProvider.evict();
                     // Trigger rebuild of only this image widget
                     setState(() {});
                   },
