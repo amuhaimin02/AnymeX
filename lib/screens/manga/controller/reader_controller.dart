@@ -34,6 +34,7 @@ class ReaderController extends GetxController {
   final RxInt currentPageIndex = 1.obs;
   final RxDouble pageWidthMultiplier = 1.0.obs;
   final RxDouble scrollSpeedMultiplier = 1.0.obs;
+  final RxBool spacedPages = false.obs;
 
   final defaultWidth = 400.obs;
   final defaultSpeed = 300.obs;
@@ -57,6 +58,8 @@ class ReaderController extends GetxController {
         settingsController.preferences.get('image_width') ?? 1;
     scrollSpeedMultiplier.value =
         settingsController.preferences.get('scroll_speed') ?? 1;
+    spacedPages.value =
+        settingsController.preferences.get('spaced_pages', defaultValue: false);
   }
 
   void _savePreferences() {
@@ -65,6 +68,7 @@ class ReaderController extends GetxController {
         .put('image_width', pageWidthMultiplier.value);
     settingsController.preferences
         .put('scroll_speed', scrollSpeedMultiplier.value);
+    settingsController.preferences.put('spaced_pages', spacedPages.value);
   }
 
   void _setupPageViewListener() {
@@ -129,6 +133,11 @@ class ReaderController extends GetxController {
 
   void toggleControls() {
     showControls.value = !showControls.value;
+  }
+
+  void toggleSpacedPages() {
+    spacedPages.value = !spacedPages.value;
+    savePreferences();
   }
 
   void navigateToChapter(int index) async {
@@ -200,6 +209,7 @@ class ReaderController extends GetxController {
 
   void changeActiveMode(ReadingMode readingMode) async {
     activeMode.value = readingMode;
+    savePreferences();
   }
 
   void savePreferences() => _savePreferences();

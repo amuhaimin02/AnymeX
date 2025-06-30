@@ -112,6 +112,7 @@ class ReaderView extends StatelessWidget {
         minZoomLevel:
             controller.activeMode.value == ReadingMode.webtoon ? 0.5 : 1.0,
         maxZoomLevel: 8.0,
+        spacing: controller.spacedPages.value ? 20 : 0,
         pageWidthLimit: getResponsiveSize(context,
             mobileSize: double.infinity,
             desktopSize: controller.defaultWidth.value *
