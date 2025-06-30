@@ -60,9 +60,9 @@ class ReaderSettings {
                             },
                             icon: switch (layout) {
                               MangaPageViewMode.continuous =>
-                                const Icon(Icons.view_day),
+                                const Icon(Iconsax.slider_vertical),
                               MangaPageViewMode.paged =>
-                                const Icon(Icons.auto_stories_rounded),
+                                const Icon(Iconsax.grid_9),
                             },
                             onPressed: () {
                               controller.changeReadingLayout(layout);
@@ -82,7 +82,7 @@ class ReaderSettings {
                       MangaPageViewDirection.up => "Bottom-Up",
                       MangaPageViewDirection.left => "RTL",
                     },
-                    icon: Iconsax.card,
+                    icon: Iconsax.direct_right,
                     postFix: Row(
                       spacing: 4,
                       children: [
@@ -102,13 +102,13 @@ class ReaderSettings {
                             },
                             icon: switch (direction) {
                               MangaPageViewDirection.down =>
-                                const Icon(Icons.swipe_down_alt_rounded),
+                                const Icon(Iconsax.arrow_down),
                               MangaPageViewDirection.right =>
-                                const Icon(Icons.swipe_right_alt_rounded),
+                                const Icon(Iconsax.arrow_right_1),
                               MangaPageViewDirection.up =>
-                                const Icon(Icons.swipe_up_alt_rounded),
+                                const Icon(Iconsax.arrow_up_3),
                               MangaPageViewDirection.left =>
-                                const Icon(Icons.swipe_left_alt_rounded),
+                                const Icon(Iconsax.arrow_left),
                             },
                             onPressed: () {
                               controller.changeReadingDirection(direction);
@@ -120,7 +120,7 @@ class ReaderSettings {
                 }),
                 Obx(() {
                   return CustomSwitchTile(
-                    icon: Icons.fast_forward,
+                    icon: Iconsax.pharagraphspacing,
                     title: "Spaced Pages",
                     description: "Continuous Mode only",
                     switchValue: controller.spacedPages.value,
