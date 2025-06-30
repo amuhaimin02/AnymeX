@@ -97,6 +97,13 @@ class ReaderView extends StatelessWidget {
   }
 
   Widget _buildContentView(BuildContext context) {
+    final hasPreviousChapter =
+        controller.chapterList.indexOf(controller.currentChapter.value!) > 0;
+    final hasNextChapter =
+        controller.chapterList.indexOf(controller.currentChapter.value!) <
+            controller.chapterList.length - 1;
+    final isLoaded = controller.loadingState.value == LoadingState.loaded;
+
     return MangaPageView(
       mode: controller.activeMode.value == ReadingMode.webtoon
           ? MangaPageViewMode.continuous
@@ -119,6 +126,7 @@ class ReaderView extends StatelessWidget {
             mobileSize: double.infinity,
             desktopSize: controller.defaultWidth.value *
                 controller.pageWidthMultiplier.value),
+        edgeIndicatorContainerSize: 240,
       ),
       pageCount: controller.pageList.length,
       pageBuilder: (context, index) {
@@ -128,45 +136,61 @@ class ReaderView extends StatelessWidget {
 
       // For previous/next chapter switching
       startEdgeDragIndicatorBuilder: (context, info) {
-        return Center(
-          child: AnimatedScale(
-            scale: info.isTriggered ? 1.5 : 1,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.elasticOut,
-            child: Icon(
-              Icons.skip_previous_rounded,
-              color: info.isTriggered ? Colors.white : Colors.white54,
-              size: 36,
+        return Column(
+          spacing: 16,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedScale(
+              scale: info.isTriggered ? 1.6 : 1,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.elasticOut,
+              child: Icon(
+                hasPreviousChapter
+                    ? Icons.skip_previous_rounded
+                    : Icons.block_rounded,
+                color: info.isTriggered ? Colors.white : Colors.white54,
+                size: 36,
+              ),
             ),
-          ),
+            Text(
+              hasPreviousChapter ? 'Previous chapter' : "No previous chapter",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: info.isTriggered ? Colors.white : Colors.white54),
+            )
+          ],
         );
       },
       endEdgeDragIndicatorBuilder: (context, info) {
-        return Center(
-          child: AnimatedScale(
-            scale: info.isTriggered ? 1.5 : 1,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.elasticOut,
-            child: Icon(
-              Icons.skip_next_rounded,
-              color: info.isTriggered ? Colors.white : Colors.white54,
-              size: 36,
+        return Column(
+          spacing: 16,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedScale(
+              scale: info.isTriggered ? 1.6 : 1,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.elasticOut,
+              child: Icon(
+                hasNextChapter ? Icons.skip_next_rounded : Icons.block_rounded,
+                color: info.isTriggered ? Colors.white : Colors.white54,
+                size: 36,
+              ),
             ),
-          ),
+            Text(
+              hasNextChapter ? 'Next chapter' : "No next chapter",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: info.isTriggered ? Colors.white : Colors.white54),
+            )
+          ],
         );
       },
-      onStartEdgeDrag:
-          controller.chapterList.indexOf(controller.currentChapter.value!) >
-                      0 &&
-                  controller.loadingState.value == LoadingState.loaded
-              ? () => controller.chapterNavigator(false)
-              : null,
-      onEndEdgeDrag:
-          controller.chapterList.indexOf(controller.currentChapter.value!) <
-                      controller.chapterList.length - 1 &&
-                  controller.loadingState.value == LoadingState.loaded
-              ? () => controller.chapterNavigator(true)
-              : null,
+      onStartEdgeDrag: hasPreviousChapter && isLoaded
+          ? () => controller.chapterNavigator(false)
+          : null,
+      onEndEdgeDrag: hasNextChapter && isLoaded
+          ? () => controller.chapterNavigator(true)
+          : null,
     );
   }
 
