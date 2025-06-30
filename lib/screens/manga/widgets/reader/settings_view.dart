@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:anymex/screens/manga/controller/reader_controller.dart';
-import 'package:anymex/screens/manga/reading_page.dart';
 import 'package:anymex/utils/function.dart';
 import 'package:anymex/widgets/common/custom_tiles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:manga_page_view/manga_page_view.dart';
 
 class ReaderSettings {
   final ReaderController controller;
@@ -37,41 +37,83 @@ class ReaderSettings {
                   ),
                 ),
                 Obx(() {
+                  final currentLayout = controller.readingLayout.value;
                   return CustomTile(
                     title: 'Layout',
-                    description:
-                        'Currently: ${controller.activeMode.value.name.toUpperCase()}',
+                    description: switch (currentLayout) {
+                      MangaPageViewMode.continuous => 'Continuous',
+                      MangaPageViewMode.paged => 'Paged',
+                    },
                     icon: Iconsax.card,
-                    postFix: 0.height(),
+                    postFix: Row(
+                      spacing: 4,
+                      children: [
+                        for (final layout in [
+                          MangaPageViewMode.continuous,
+                          MangaPageViewMode.paged
+                        ])
+                          IconButton.filled(
+                            isSelected: layout == currentLayout,
+                            tooltip: switch (layout) {
+                              MangaPageViewMode.continuous => 'Continuous',
+                              MangaPageViewMode.paged => 'Paged',
+                            },
+                            icon: switch (layout) {
+                              MangaPageViewMode.continuous =>
+                                const Icon(Icons.view_day),
+                              MangaPageViewMode.paged =>
+                                const Icon(Icons.auto_stories_rounded),
+                            },
+                            onPressed: () {
+                              controller.changeReadingLayout(layout);
+                            },
+                          )
+                      ],
+                    ),
                   );
                 }),
                 Obx(() {
-                  final selections = List<bool>.generate(
-                    ReadingMode.values.length,
-                    (index) =>
-                        index ==
-                        ReadingMode.values.indexOf(controller.activeMode.value),
-                  );
-                  return Center(
-                    child: ToggleButtons(
-                      isSelected: selections,
-                      onPressed: (int index) {
-                        final mode = ReadingMode.values[index];
-                        controller.changeActiveMode(mode);
-                      },
-                      children: const [
-                        Tooltip(
-                          message: 'Webtoon',
-                          child: Icon(Icons.view_day),
-                        ),
-                        Tooltip(
-                          message: 'LTR',
-                          child: Icon(Icons.format_textdirection_l_to_r),
-                        ),
-                        Tooltip(
-                          message: 'RTL',
-                          child: Icon(Icons.format_textdirection_r_to_l),
-                        ),
+                  final currentDirection = controller.readingDirection.value;
+                  return CustomTile(
+                    title: 'Direction',
+                    description: switch (currentDirection) {
+                      MangaPageViewDirection.down => "Top-Down",
+                      MangaPageViewDirection.right => "LTR",
+                      MangaPageViewDirection.up => "Bottom-Up",
+                      MangaPageViewDirection.left => "RTL",
+                    },
+                    icon: Iconsax.card,
+                    postFix: Row(
+                      spacing: 4,
+                      children: [
+                        for (final direction in [
+                          MangaPageViewDirection.down,
+                          MangaPageViewDirection.right,
+                          MangaPageViewDirection.up,
+                          MangaPageViewDirection.left,
+                        ])
+                          IconButton.filled(
+                            isSelected: direction == currentDirection,
+                            tooltip: switch (direction) {
+                              MangaPageViewDirection.down => "Top-Down",
+                              MangaPageViewDirection.right => "LTR",
+                              MangaPageViewDirection.up => "Bottom-Up",
+                              MangaPageViewDirection.left => "RTL",
+                            },
+                            icon: switch (direction) {
+                              MangaPageViewDirection.down =>
+                                const Icon(Icons.swipe_down_alt_rounded),
+                              MangaPageViewDirection.right =>
+                                const Icon(Icons.swipe_right_alt_rounded),
+                              MangaPageViewDirection.up =>
+                                const Icon(Icons.swipe_up_alt_rounded),
+                              MangaPageViewDirection.left =>
+                                const Icon(Icons.swipe_left_alt_rounded),
+                            },
+                            onPressed: () {
+                              controller.changeReadingDirection(direction);
+                            },
+                          )
                       ],
                     ),
                   );
@@ -80,7 +122,7 @@ class ReaderSettings {
                   return CustomSwitchTile(
                     icon: Icons.fast_forward,
                     title: "Spaced Pages",
-                    description: "Add gaps between pages. Continuous mode only",
+                    description: "Continuous Mode only",
                     switchValue: controller.spacedPages.value,
                     onChanged: (val) => controller.toggleSpacedPages(),
                   );
@@ -94,7 +136,7 @@ class ReaderSettings {
                         controller.pageWidthMultiplier.value = value;
                       },
                       onChangedEnd: (e) => controller.savePreferences(),
-                      description: 'Only Works with webtoon mode',
+                      description: 'Continuous Mode only',
                       icon: Icons.image_aspect_ratio_rounded,
                       min: 1.0,
                       max: 4.0,
@@ -125,14 +167,5 @@ class ReaderSettings {
         );
       },
     );
-  }
-
-  List<bool> createSelectionRange() {
-    final ReaderController controller = Get.find<ReaderController>();
-    const readingModes = ReadingMode.values;
-    final trueIndex = readingModes.indexOf(controller.activeMode.value);
-    final newRange = [false, false, false];
-    newRange[trueIndex] = true;
-    return newRange;
   }
 }
